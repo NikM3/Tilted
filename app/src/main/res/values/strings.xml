@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Tilted</string>
+    <string name="sensor_format">%1$.2f</string>
+    <string name="direction_label">Direction: </string>
+    <string name="pitch_label">Pitch: </string>
+    <string name="roll_label">Roll: </string>
 </resources>
