@@ -6,6 +6,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.view.Display
+import android.view.Surface
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.rotationMatrix
@@ -14,6 +17,7 @@ import com.nikm3.tilted.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var display: Display
     private lateinit var sensorManager: SensorManager
     private lateinit var sensorAccelerometer: Sensor
     private lateinit var sensorMagnetometer: Sensor
@@ -33,6 +37,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorMagnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        // Prepare to lock orientation
+        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        display = windowManager.defaultDisplay
     }
 
     override fun onStart() {
@@ -80,8 +88,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 accelerometerData,
                 magnetometerData
             )
+            var rotationMatrixAdjusted = FloatArray(9)
+            when (display.rotation) {
+                Surface.ROTATION_0 -> {
+                    rotationMatrixAdjusted = rotationMatrix.clone();
+                }
+                Surface.ROTATION_90 -> {
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X,
+                        rotationMatrixAdjusted);
+                }
+                Surface.ROTATION_180 -> {
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y,
+                        rotationMatrixAdjusted);
+                }
+                Surface.ROTATION_270 -> {
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X,
+                        rotationMatrixAdjusted);
+                }
+            }
             val orientationValues = FloatArray(3)
-            if (rotationOK) {SensorManager.getOrientation(rotationMatrix,orientationValues)}
+            if (rotationOK) {SensorManager.getOrientation(rotationMatrixAdjusted,orientationValues)}
             val direction = orientationValues[0]
             val pitch = orientationValues[1]
             val roll = orientationValues[2]
