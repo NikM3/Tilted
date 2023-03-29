@@ -6,7 +6,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.rotationMatrix
 import com.nikm3.tilted.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -15,6 +17,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private lateinit var sensorAccelerometer: Sensor
     private lateinit var sensorMagnetometer: Sensor
+    private lateinit var playerDirection: TextView
+    private lateinit var playerPitch: TextView
+    private lateinit var playerRoll: TextView
+    private var accelerometerData = FloatArray(3)
+    private var magnetometerData = FloatArray(3)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +42,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val goalDirection = binding.goalDirection
         val goalPitch = binding.goalPitch
         val goalRoll = binding.goalRoll
-        val playerDirection = binding.playerDirection
-        val playerPitch = binding.playerPitch
-        val playerRoll = binding.playerRoll
+        playerDirection = binding.playerDirection
+        playerPitch = binding.playerPitch
+        playerRoll = binding.playerRoll
 
         sensorManager.registerListener(
             this, sensorAccelerometer,
@@ -54,10 +61,41 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
     override fun onSensorChanged(event: SensorEvent?) {
-        TODO("Not yet implemented")
+        if (event != null) {
+            when (event.sensor.type) {
+                Sensor.TYPE_ACCELEROMETER -> {
+                    accelerometerData = event.values.clone()
+                }
+                Sensor.TYPE_MAGNETIC_FIELD -> {
+                    magnetometerData = event.values.clone()
+                }
+                else -> {
+                    return
+                }
+            }
+            val rotationMatrix = FloatArray(9)
+            val rotationOK = SensorManager.getRotationMatrix(
+                rotationMatrix,
+                null,
+                accelerometerData,
+                magnetometerData
+            )
+            val orientationValues = FloatArray(3)
+            if (rotationOK) {SensorManager.getOrientation(rotationMatrix,orientationValues)}
+            val direction = orientationValues[0]
+            val pitch = orientationValues[1]
+            val roll = orientationValues[2]
+
+            if (this::playerDirection.isInitialized)
+                playerDirection.text = getString(R.string.sensor_format, direction)
+            if (this::playerPitch.isInitialized)
+                playerPitch.text = getString(R.string.sensor_format, pitch)
+            if (this::playerRoll.isInitialized)
+                playerRoll.text = getString(R.string.sensor_format, roll)
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        /* Intentionally left blank */
     }
 }
