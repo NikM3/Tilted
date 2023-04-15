@@ -4,4 +4,5 @@
     <string name="direction_label">Direction: </string>
     <string name="pitch_label">Pitch: </string>
     <string name="roll_label">Roll: </string>
+    <string name="player_score">Score: %d</string>
 </resources>

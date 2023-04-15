@@ -6,16 +6,18 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.widget.TextView
 import com.nikm3.tilted.databinding.ActivityMainBinding
 
 
 class MainActivity : Activity(), SensorEventListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var gameScreen: AnimatedView
+    private lateinit var playerScore: TextView
 
     private var sensorManager: SensorManager? = null
     private var accelerometer: Sensor? = null
-    private var gameScreen: AnimatedView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,8 @@ class MainActivity : Activity(), SensorEventListener {
         accelerometer = sensorManager!!
             .getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         gameScreen = binding.gameScreen
+        playerScore = binding.scoreCounter
+        playerScore.text = getString(R.string.player_score, 0)
     }
 
     override fun onResume() {
@@ -47,8 +51,8 @@ class MainActivity : Activity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            gameScreen?.updatePuck(event.values[0].toInt(), event.values[1].toInt())
-            gameScreen?.invalidate()
+            gameScreen.updatePuck(event.values[0].toInt(), event.values[1].toInt())
+            playerScore.text = getString(R.string.player_score, gameScreen.score)
         }
     }
 }

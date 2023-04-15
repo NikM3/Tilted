@@ -21,6 +21,7 @@ class AnimatedView @JvmOverloads constructor(
     private var goalY: Int = 0
     private var goalWidth: Int = puckWidth * 4
     private var goalHeight: Int = puckHeight * 4
+    var score = 0
 
     init {
         puckX = width / 2
@@ -71,8 +72,10 @@ class AnimatedView @JvmOverloads constructor(
             puckRight < goalRight &&
             puckTop > goalTop &&
             puckBot < goalBot
-        )
+        ) {
+            score++
             newGoal()
+        }
     }
 
     private fun makeGoal(canvas: Canvas) {
@@ -96,8 +99,8 @@ class AnimatedView @JvmOverloads constructor(
         } else if (puckRight > width) {
             puckX = width - puckWidth
         }
-        if (puckTop < y) {
-            puckY = y.toInt()
+        if (puckTop < y - 100) {
+            puckY = y.toInt() - 100
         } else if (puckBot > height) {
             puckY = height - puckHeight
         }
