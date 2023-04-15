@@ -24,11 +24,14 @@ class MainActivity : Activity(), SensorEventListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // View binding
+        gameScreen = binding.gameScreen
+        playerScore = binding.scoreCounter
+
+        // Instantiate sensors and initialize score
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager!!
             .getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        gameScreen = binding.gameScreen
-        playerScore = binding.scoreCounter
         playerScore.text = getString(R.string.player_score, 0)
     }
 
@@ -49,9 +52,17 @@ class MainActivity : Activity(), SensorEventListener {
         /* Intentionally left blank */
     }
 
+    /**
+     * Tell the view what direction to move the puck.
+     * It should slide in the direction that the phone is tilted.
+     * Brute force the score by constantly rewriting it.
+     */
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            gameScreen.updatePuck(event.values[0].toInt(), event.values[1].toInt())
+            gameScreen.updatePuck(
+                event.values[0].toInt(),
+                event.values[1].toInt()
+            )
             playerScore.text = getString(R.string.player_score, gameScreen.score)
         }
     }

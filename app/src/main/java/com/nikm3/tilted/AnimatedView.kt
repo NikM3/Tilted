@@ -23,7 +23,11 @@ class AnimatedView @JvmOverloads constructor(
     private var goalHeight: Int = puckHeight * 4
     var score = 0
 
+    /**
+     * Constructor stuff, initialize the goal and puck
+     */
     init {
+        goalDrawable.paint.color = resources.getColor(R.color.purple_200, null)
         puckX = width / 2
         puckY = height / 2
         puckDrawable.paint.color = -0x53dd
@@ -35,30 +39,39 @@ class AnimatedView @JvmOverloads constructor(
         )
     }
 
+    /**
+     * Should only be called the first time the view is drawn,
+     * generate coordinates for a new goal.
+     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         newGoal()
     }
 
+    /**
+     * Draw the goal and puck at their current coordinates.
+     * Ensure the puck is not leaving the screen before drawing it.
+     * Also check if the puck is within the goal.
+     */
     override fun onDraw(canvas: Canvas) {
         makeGoal(canvas)
         checkBounds()
-        puckDrawable.setBounds(
-            puckX,
-            puckY,
-            puckX + puckWidth,
-            puckY + puckHeight
-        )
-        puckDrawable.draw(canvas)
+        makePuck(canvas)
         checkGoal()
         invalidate()
     }
 
+    /**
+     * Generate new coordinates for the goal
+     */
     private fun newGoal() {
-        goalX = Random.nextInt(1, width - goalWidth - 1)
-        goalY = Random.nextInt(1, height - goalHeight - 1)
+        goalX = Random.nextInt(1, (width - goalWidth - 1))
+        goalY = Random.nextInt(1, (height - goalHeight - 1))
     }
 
+    /**
+     * Check if the puck is currently within the bounds of the goal
+     */
     private fun checkGoal() {
         val puckTop = puckY
         val puckBot = puckY + puckHeight
@@ -78,6 +91,9 @@ class AnimatedView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Draw the goal
+     */
     private fun makeGoal(canvas: Canvas) {
         goalDrawable.setBounds(
             goalX,
@@ -89,6 +105,9 @@ class AnimatedView @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * Ensure the puck does not move off of the screen or under the player banner
+     */
     private fun checkBounds() {
         val puckTop = puckY
         val puckBot = puckY + puckHeight
@@ -106,9 +125,25 @@ class AnimatedView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Draw the puck
+     */
+    private fun makePuck(canvas: Canvas) {
+        puckDrawable.setBounds(
+            puckX,
+            puckY,
+            puckX + puckWidth,
+            puckY + puckHeight
+        )
+        puckDrawable.draw(canvas)
+    }
+
+    /**
+     * Update the puck's coordinates with sensor information from Main
+     */
     fun updatePuck(newX: Int, newY: Int) {
-        puckX -= newX
-        puckY += newY
+        puckY += newX
+        puckX += newY
     }
 
     companion object {
