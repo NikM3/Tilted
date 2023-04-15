@@ -8,6 +8,10 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.TextView
 import com.nikm3.tilted.databinding.ActivityMainBinding
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : Activity(), SensorEventListener {
@@ -64,6 +68,27 @@ class MainActivity : Activity(), SensorEventListener {
                 event.values[1].toInt()
             )
             playerScore.text = getString(R.string.player_score, gameScreen.score)
+            if (gameScreen.konfettiTime) {
+                confetti()
+            }
         }
+    }
+
+    /**
+     * Pop some confetti to congratulate the user
+     */
+    private fun confetti() {
+        val party = Party(
+            speed = 0f,
+            maxSpeed = 30f,
+            damping = 0.9f,
+            spread = 360,
+            colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+            position = Position.Relative(gameScreen.relativeX, gameScreen.relativeY),
+            emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
+        )
+        val konfetti = findViewById<nl.dionsegijn.konfetti.xml.KonfettiView>(R.id.konfettiView)
+        konfetti.start(party)
+        gameScreen.konfettiTime = false
     }
 }

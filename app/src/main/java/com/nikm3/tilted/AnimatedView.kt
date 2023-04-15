@@ -22,6 +22,9 @@ class AnimatedView @JvmOverloads constructor(
     private var goalWidth: Int = puckWidth * 4
     private var goalHeight: Int = puckHeight * 4
     var score = 0
+    var relativeX = 0.0
+    var relativeY = 0.0
+    var konfettiTime = false
 
     /**
      * Constructor stuff, initialize the goal and puck
@@ -86,6 +89,7 @@ class AnimatedView @JvmOverloads constructor(
             puckTop > goalTop &&
             puckBot < goalBot
         ) {
+            confetti()
             score++
             newGoal()
         }
@@ -144,6 +148,15 @@ class AnimatedView @JvmOverloads constructor(
     fun updatePuck(newX: Int, newY: Int) {
         puckY += newX
         puckX += newY
+    }
+
+    /**
+     * Pop some confetti to congratulate the user
+     */
+    private fun confetti() {
+        relativeX = ((puckX + puckWidth * 0.5) / width.toDouble())
+        relativeY = ((puckY + puckHeight * 0.5) / height.toDouble())
+        konfettiTime = true
     }
 
     companion object {
