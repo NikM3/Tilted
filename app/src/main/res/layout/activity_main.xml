@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.nikm3.tilted.AnimatedView
+        android:id="@+id/gameScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TableLayout
         android:id="@+id/tableLayout"
         android:layout_width="match_parent"
